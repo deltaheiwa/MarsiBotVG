@@ -1,0 +1,15 @@
+<configuration>
+    <conversionRule conversionWord="highlight" converterClass="ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="com.marsi.bot" level="debug"/>
+</configuration>
