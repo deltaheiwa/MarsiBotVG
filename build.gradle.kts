@@ -33,5 +33,5 @@ dependencies {
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.isIncremental = true
-    sourceCompatibility = "1.11"
+    sourceCompatibility = "1.9"
 }

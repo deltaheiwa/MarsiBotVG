@@ -1,6 +1,6 @@
 package com.marsi.vg.enums;
 
-enum RoleFaction {
+public enum RoleFaction {
     GOOD,
     EVIL,
     NEUTRAL_EVIL,

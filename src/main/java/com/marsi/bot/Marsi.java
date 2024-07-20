@@ -6,6 +6,7 @@ import com.marsi.bot.listeners.*;
 import com.marsi.bot.objects.DiscordCommand;
 import com.marsi.console.ConsoleThread;
 import com.marsi.database.PrefixDatabase;
+import com.marsi.vg.Launcher;
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -49,6 +50,8 @@ public class Marsi {
 
         prefixDatabase = new PrefixDatabase("jdbc:sqlite:./src/main/resources/databases/prefixes.db");
         prefixDatabase.createTables();
+
+        Launcher.initialize();
     }
 
     private EnumSet<GatewayIntent> getIntents() {
