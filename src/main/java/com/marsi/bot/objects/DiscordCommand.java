@@ -9,12 +9,11 @@ import java.util.List;
 
 
 public abstract class DiscordCommand {
-    protected final Logger logger = LoggerFactory.getLogger(DiscordCommand.class);
+    protected final Logger logger = LoggerFactory.getLogger("DiscordCommand");
 
     public abstract String getName();
     public abstract String getDescription();
     public abstract List<String> getAliases();
-
 
     public CommandData getCommandData() {
         return Commands.slash(getName(), getDescription());

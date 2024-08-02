@@ -1,5 +1,6 @@
 package com.marsi.vg.database;
 
+import com.marsi.commons.database.Row;
 import com.marsi.commons.database.SQLiteDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,13 +9,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class VillageGameDatabase extends SQLiteDatabase {
-    private static final Logger logger = LoggerFactory.getLogger(VillageGameDatabase.class);
+    private static final Logger logger = LoggerFactory.getLogger("VillageGameDatabase");
     private final ExecutorService executor;
 
     public VillageGameDatabase(String uri) {
@@ -43,7 +46,7 @@ public class VillageGameDatabase extends SQLiteDatabase {
                         + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                         + "discord_id TEXT NOT NULL,"
                         + "role_id INTEGER NULL,"
-                        + "house_id INTEGER NULL,"
+                        + "house_id TEXT NULL,"
                         + "lobby_id INTEGER NOT NULL,"
                         + "FOREIGN KEY (lobby_id) REFERENCES lobby(id));",
 
@@ -67,7 +70,7 @@ public class VillageGameDatabase extends SQLiteDatabase {
 
                 // Location
                 "CREATE TABLE IF NOT EXISTS location ("
-                        + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        + "id TEXT PRIMARY KEY,"
                         + "channel_id TEXT NOT NULL,"
                         + "name TEXT NOT NULL,"
                         + "lobby_id INTEGER NOT NULL,"
@@ -126,10 +129,12 @@ public class VillageGameDatabase extends SQLiteDatabase {
                         + "player_id INTEGER NOT NULL,"
                         + "phase_id INTEGER NOT NULL,"
                         + "phase_counter INTEGER NOT NULL,"
+                        + "location_id TEXT NOT NULL,"
                         + "cause_id INTEGER NOT NULL,"
                         + "timestamp TEXT NOT NULL,"
                         + "FOREIGN KEY (player_id) REFERENCES player(id),"
                         + "FOREIGN KEY (phase_id) REFERENCES phase(id),"
+                        + "FOREIGN KEY (location_id) REFERENCES location(id),"
                         + "FOREIGN KEY (cause_id) REFERENCES cause_of_death(id));",
 
                 // Visit Log
@@ -192,17 +197,86 @@ public class VillageGameDatabase extends SQLiteDatabase {
         }
     }
 
-    public Future<ResultSet> getLobbyByServerId(String serverId) {
-        Callable<ResultSet> task = () -> {
-            try (Connection connection = connect()) {
-                PreparedStatement statement = connection.prepareStatement("SELECT * FROM lobby WHERE server_id = ?");
+    public Future<Row> getLobbyByServerId(String serverId) {
+        Callable<Row> task = () -> {
+            List<Row> result = new ArrayList<>();
+            try (Connection connection = connect();
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM lobby WHERE server_id = ?")) {
                 statement.setString(1, serverId);
-                return statement.executeQuery();
+                ResultSet rs = statement.executeQuery();
+                while (rs.next()) {
+                    Row row = new Row();
+                    row.fetchRow(rs, List.of("id", "server_id", "status_id", "max_players"));
+                    result.add(row);
+                }
             } catch (Exception e) {
-                logger.error("Error checking if lobby exists", e);
+                logger.error("Error fetching lobby by server ID", e);
                 throw e;
             }
+            return result.isEmpty() ? null : result.get(0);
         };
         return executor.submit(task);
+    }
+
+    public Future<Row> getLobbyByServerId(long serverId) {
+        return getLobbyByServerId(String.valueOf(serverId));
+    }
+
+    public Future<List<Row>> getAllLobbies() {
+        Callable<List<Row>> task = () -> {
+            List<Row> result = new ArrayList<>();
+            try (Connection connection = connect();
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM lobby")) {
+                ResultSet rs = statement.executeQuery();
+                while (rs.next()) {
+                    Row row = new Row();
+                    row.fetchRow(rs, List.of("id", "server_id", "status_id", "max_players"));
+                    result.add(row);
+                }
+            } catch (Exception e) {
+                logger.error("Error fetching all lobbies", e);
+                throw e;
+            }
+            return result;
+        };
+        return executor.submit(task);
+    }
+
+    public Future<List<Row>> getAllOpenLobbies() {
+        Callable<List<Row>> task = () -> {
+            List<Row> result = new ArrayList<>();
+            try (Connection connection = connect();
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM lobby WHERE status_id = (SELECT id FROM lobby_status WHERE status = 'OPEN')")) {
+                ResultSet rs = statement.executeQuery();
+                while (rs.next()) {
+                    Row row = new Row();
+                    row.fetchRow(rs, List.of("id", "server_id", "status_id", "max_players"));
+                    result.add(row);
+                }
+            } catch (Exception e) {
+                logger.error("Error fetching all open lobbies", e);
+                throw e;
+            }
+            return result;
+        };
+        return executor.submit(task);
+    }
+
+    public void createLobby(String serverId, int statusId, int maxPlayers) {
+        Callable<Void> task = () -> {
+            try (Connection connection = connect()) {
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO lobby (server_id, status_id, max_players) VALUES (?, ?, ?)");
+                statement.setString(1, serverId);
+                statement.setInt(2, statusId);
+                statement.setInt(3, maxPlayers);
+                statement.execute();
+                connection.commit();
+            } catch (Exception e) {
+                logger.error("Error storing lobby", e);
+                throw e;
+            }
+            return null;
+        };
+        executor.submit(task);
     }
 }

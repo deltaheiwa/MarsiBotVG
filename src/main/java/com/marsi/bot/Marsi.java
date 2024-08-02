@@ -2,6 +2,7 @@ package com.marsi.bot;
 
 import com.marsi.bot.commands.admin.*;
 import com.marsi.bot.commands.info.*;
+import com.marsi.bot.commands.vg_setup.*;
 import com.marsi.bot.listeners.*;
 import com.marsi.bot.objects.DiscordCommand;
 import com.marsi.console.ConsoleThread;
@@ -23,7 +24,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class Marsi {
-    private final static Logger logger = LoggerFactory.getLogger(Marsi.class);
+    private final static Logger logger = LoggerFactory.getLogger("Marsi");
     private final Dotenv config;
     private static Marsi instance = null;
 
@@ -74,6 +75,9 @@ public class Marsi {
         commands.add(new SetPrefix());
         commands.add(new Sync());
         commands.add(new Ping());
+
+        commands.add(new AutoMap());
+        commands.add(new MapChannel());
     }
 
     public PrefixDatabase getPrefixDatabase() {

@@ -1,7 +1,8 @@
 package com.marsi.vg.enums;
 
-enum LocationType {
+public enum LocationType {
     HOUSE,
     JAIL,
+    PRIVATE_CHAT,
     NULL
 }

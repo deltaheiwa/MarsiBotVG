@@ -2,9 +2,7 @@ package com.marsi.console;
 
 import com.marsi.console.commands.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class ConsoleThread extends Thread {
     Map<String, ConsoleCommand> commands;
@@ -13,6 +11,7 @@ public class ConsoleThread extends Thread {
         this.commands = new HashMap<>();
         this.commands.put("exit", new Exit());
         this.commands.put("status", new Status());
+        this.commands.put("inspect", new Inspect());
     }
 
     public ConsoleThread(Map<String, ConsoleCommand> commands) {
@@ -25,10 +24,12 @@ public class ConsoleThread extends Thread {
             System.out.print("> ");
             Scanner scanner = new Scanner(System.in);
 
-            String command = scanner.nextLine();
+            List<String> input = List.of(scanner.nextLine().split(" "));
+
+            String command = input.get(0);
 
             if (commands.containsKey(command)) {
-                commands.get(command).execute();
+                commands.get(command).execute(input);
             } else {
                 System.out.println("Unknown command");
             }

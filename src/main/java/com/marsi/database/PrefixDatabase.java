@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class PrefixDatabase extends SQLiteDatabase {
-    private final static Logger logger = LoggerFactory.getLogger(PrefixDatabase.class);
+    private final static Logger logger = LoggerFactory.getLogger("PrefixDatabase");
 
     public PrefixDatabase(String uri) {
         super(uri);

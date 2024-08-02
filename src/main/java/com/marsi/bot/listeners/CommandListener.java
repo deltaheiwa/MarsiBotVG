@@ -16,9 +16,9 @@ public class CommandListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        String dynamicPrefix = event.isFromGuild() ? Marsi.getInstance().getPrefixDatabase().getPrefix(event.getGuild().getId()) : "tk-";
+        String dynamicPrefix = event.isFromGuild() ? Marsi.getInstance().getPrefixDatabase().getPrefix(event.getGuild().getId()) : "m-";
 
-        commandHandler.handleTextCommand(event, dynamicPrefix);
+        commandHandler.handleTextCommand(event, dynamicPrefix != null ? dynamicPrefix : "m-");
     }
 
     @Override
