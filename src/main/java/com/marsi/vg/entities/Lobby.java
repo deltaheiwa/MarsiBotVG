@@ -53,7 +53,7 @@ public class Lobby {
         return new Lobby(
                 (int) row.get("id"),
                 (String) row.get("server_id"),
-                LobbyStatus.valueOf((String) row.get("status_id")),
+                LobbyStatus.fromDatabaseId((int) row.get("status_id")),
                 (int) row.get("max_players")
         );
     }

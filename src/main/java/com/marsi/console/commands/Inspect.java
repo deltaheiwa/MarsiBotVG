@@ -3,6 +3,7 @@ package com.marsi.console.commands;
 import com.marsi.vg.Launcher;
 import com.marsi.vg.entities.Lobby;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class Inspect extends ConsoleCommand {
@@ -15,8 +16,8 @@ public class Inspect extends ConsoleCommand {
         String target = args.get(1).toLowerCase();
         switch (target) {
             case "lobbies":
-                System.out.println("Lobbies: " + Launcher.getLobbies().size());
-                for (Lobby lobby : Launcher.getLobbies()) {
+                for (Iterator<Lobby> it = Launcher.getLobbies(); it.hasNext(); ) {
+                    Lobby lobby = it.next();
                     System.out.println(lobby);
                 }
                 break;

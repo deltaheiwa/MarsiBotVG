@@ -20,9 +20,9 @@ public class ConsoleThread extends Thread {
 
     @Override
     public void run() {
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("> ");
-            Scanner scanner = new Scanner(System.in);
 
             List<String> input = List.of(scanner.nextLine().split(" "));
 

@@ -12,4 +12,5 @@
     </root>
 
     <logger name="com.marsi.bot" level="debug"/>
+    <logger name="com.marsi.vg" level="debug"/>
 </configuration>
