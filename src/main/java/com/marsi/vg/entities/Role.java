@@ -13,7 +13,6 @@ public abstract class Role {
     private String aura;
     private List<ActiveAbility> activeAbilities;
     private List<PassiveAbility> passiveAbilities;
-    private int baseDayVisits;
-    private int baseNightVisits;
+    private List<Visit> visits;
 
 }

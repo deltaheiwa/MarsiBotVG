@@ -33,9 +33,10 @@ public class AutoMap extends DiscordCommand {
     @Override
     public void execute(DiscordCommandContext context) {
         try {
+            String arg1 = context.getArg(0);
             Row lobbyInfo = Launcher.getDatabase().getLobbyByServerId(context.getGuild().getId()).get();
             if (lobbyInfo == null) {
-                Launcher.getDatabase().createLobby(context.getGuild().getId(), LobbyStatus.OPEN.asDatabaseId(), 30);
+                Launcher.getDatabase().addLobby(context.getGuild().getId(), LobbyStatus.OPEN.asDatabaseId(), 30);
                 lobbyInfo = Launcher.getDatabase().getLobbyByServerId(context.getGuild().getId()).get();
             }
             Lobby lobby = new Lobby(
@@ -45,53 +46,56 @@ public class AutoMap extends DiscordCommand {
                     (int) lobbyInfo.get("max_players")
             );
 
-            HashMap<String, Long> houses = new HashMap<>();
-            HashMap<String, Long> role_channels = new HashMap<>();
+            HashMap<String, String> houses = new HashMap<>();
+            HashMap<String, String> role_channels = new HashMap<>();
             List<Channel> unregisteredChannels = new ArrayList<>();
             context.getGuild().getCategoryCache().forEachUnordered(category -> {
                 if (category.getName().toLowerCase().contains("houses") || category.getName().toLowerCase().contains("nighttime")) {
                     for (int hn = 1; hn <= category.getChannels().size(); hn++) {
                         GuildChannel channel = category.getChannels().get(hn - 1);
-                        Location house = new Location(String.format("h%s", hn), "house-" + hn, channel.getIdLong());
+                        Location house = new Location(String.format("h%s", hn), lobby.getId(),"house-" + hn, channel.getIdLong());
                         if (!channel.getName().toLowerCase().contains("house") && !channel.getName().toLowerCase().contains(String.format("%s", hn))) {
                             channel.getManager().setName("house-" + hn).queue();
                         }
-                        houses.put("house-" + hn, category.getChannels().get(hn - 1).getIdLong());
+                        houses.put("h" + hn, category.getChannels().get(hn - 1).getId());
+                        lobby.addHouse(house);
                     }
                 } else if (category.getName().toLowerCase().contains("roles")) {
                     for (int rn = 1; rn <= category.getChannels().size(); rn++) {
                         GuildChannel channel = category.getChannels().get(rn - 1);
-                        role_channels.put(String.valueOf(rn), channel.getIdLong());
+                        role_channels.put(channel.getId(), "");
                     }
                 } else {
                     category.getChannels().forEach(channel -> {
                         String channelName = channel.getName().toLowerCase().replace("-", " ");
+                        // The reason why I have to do this ugly stuff, is because I cant use .contains() with switch statement
+                        // and I cant opt out for .equals() because the channel name can contain emojis, etc.
                         if (channelName.contains("rules")) {
-                            lobby.getChannelMap().put("rules", channel.getIdLong());
+                            lobby.setChannelId("rules", channel.getId());
                         } else if (channelName.contains("mechanics")) {
-                            lobby.getChannelMap().put("mechanics", channel.getIdLong());
+                            lobby.setChannelId("mechanics", channel.getId());
                         } else if (channelName.contains("pre game announcements") || channelName.contains("minor announcements")) {
-                            lobby.getChannelMap().put("pg-announcements", channel.getIdLong());
+                            lobby.setChannelId("pg-announcements", channel.getId());
                         } else if (channelName.contains("playerlist") || channelName.contains("player list")) {
-                            lobby.getChannelMap().put("player-list", channel.getIdLong());
+                            lobby.setChannelId("player-list", channel.getId());
                         } else if (channelName.contains("announcements")) {
-                            lobby.getChannelMap().put("announcements", channel.getIdLong());
+                            lobby.setChannelId("announcements", channel.getId());
                         } else if (channelName.contains("overseer status")) {
-                            lobby.getChannelMap().put("overseer-status", channel.getIdLong());
+                            lobby.setChannelId("overseer-status", channel.getId());
                         } else if (channelName.contains("map")) {
-                            lobby.getChannelMap().put("map", channel.getIdLong());
+                            lobby.setChannelId("map", channel.getId());
                         } else if (channelName.contains("death reports")) {
-                            lobby.getChannelMap().put("death-reports", channel.getIdLong());
+                            lobby.setChannelId("death-reports", channel.getId());
                         } else if (channelName.contains("megaphone")) {
-                            lobby.getChannelMap().put("megaphone", channel.getIdLong());
+                            lobby.setChannelId("megaphone", channel.getId());
                         } else if (channelName.contains("day chat") || channelName.contains("day discussion")) {
-                            lobby.getChannelMap().put("day-chat", channel.getIdLong());
+                            lobby.setChannelId("day-chat", channel.getId());
                         } else if (channelName.contains("vote channel")) {
-                            lobby.getChannelMap().put("vote-channel", channel.getIdLong());
+                            lobby.setChannelId("vote-channel", channel.getId());
                         } else if (channelName.contains("vote count")) {
-                            lobby.getChannelMap().put("vote-count", channel.getIdLong());
+                            lobby.setChannelId("vote-count", channel.getId());
                         } else if (channelName.contains("graveyard")) {
-                            lobby.getChannelMap().put("graveyard", channel.getIdLong());
+                            lobby.setChannelId("graveyard", channel.getId());
                         }
                         else {
                             unregisteredChannels.add(channel);
@@ -105,6 +109,10 @@ public class AutoMap extends DiscordCommand {
             StringBuilder response = new StringBuilder("Server mapped successfully! \n\nUnmapped channels: ");
             for (Channel channel : unregisteredChannels) {
                 response.append(channel.getAsMention()).append(", ");
+            }
+
+            if (arg1 != null && arg1.equals("raw")) {
+                Launcher.getDatabase().addLocationBulk(lobby.getHouses());
             }
 
             context.sendMessage(response.toString());

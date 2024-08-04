@@ -2,7 +2,6 @@ package com.marsi.vg.entities;
 
 import com.marsi.vg.enums.AbilityCategory;
 import com.marsi.vg.enums.AbilityTarget;
-import com.marsi.vg.enums.AbilityUsagePhase;
 import com.marsi.vg.enums.AbilityUseType;
 
 import java.util.EnumSet;

@@ -18,7 +18,7 @@ public class Lobby {
     private ListOrderedSet<Role> role_list;
 
     private List<Player> players;
-    private Map<String, Long> channelMap;
+    private Map<String, String> channelMap;
     private List<Location> houses;
 
 
@@ -30,32 +30,37 @@ public class Lobby {
 
         this.role_list = new ListOrderedSet<>();
         this.players = new ArrayList<>();
-        this.channelMap = Stream.of(new Object[][] {
-                { "rules", 0L },
-                { "mechanics", 0L },
-                { "pg-announcements", 0L },
-                { "player-list", 0L },
-                { "announcements", 0L },
-                { "overseer-status", 0L },
-                { "map", 0L },
-                { "death-reports", 0L },
-                { "megaphone", 0L },
-                { "day-chat", 0L },
-                { "vote-channel", 0L },
-                { "vote-count", 0L },
-                { "graveyard", 0L },
-        }).collect(Collectors.toMap(data -> (String) data[0], data -> (Long) data[1]));
+        this.channelMap = Stream.of(new String[][] {
+                { "rules", "" },
+                { "mechanics", "" },
+                { "pg-announcements", "" },
+                { "player-list", "" },
+                { "announcements", "" },
+                { "overseer-status", "" },
+                { "map", "" },
+                { "death-reports", "" },
+                { "megaphone", "" },
+                { "day-chat", "" },
+                { "vote-channel", "" },
+                { "vote-count", "" },
+                { "graveyard", "" },
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         this.houses = new ArrayList<>();
     }
 
     public static Lobby fromRow(Row row) {
-        return new Lobby(
+        String serverId = (String) row.get("server_id");
+        Lobby lobby = new Lobby(
                 (int) row.get("id"),
-                (String) row.get("server_id"),
+                serverId,
                 LobbyStatus.fromDatabaseId((int) row.get("status_id")),
                 (int) row.get("max_players")
         );
+
+
+
+        return lobby;
     }
 
     public int getId() {
@@ -74,15 +79,23 @@ public class Lobby {
         return maxPlayers;
     }
 
-    public Map<String, Long> getChannelMap() {
+    public Map<String, String> getChannelMap() {
         return channelMap;
     }
 
-    public void setChannelId(String channelCode, Long channelId) {
+    public void setChannelId(String channelCode, String channelId) {
         if (!channelMap.containsKey(channelCode)) {
             throw new IllegalArgumentException("Channel code not found");
         }
         channelMap.put(channelCode, channelId);
+    }
+
+    public void addHouse(Location house) {
+        houses.add(house);
+    }
+
+    public List<Location> getHouses() {
+        return houses;
     }
 
     @Override

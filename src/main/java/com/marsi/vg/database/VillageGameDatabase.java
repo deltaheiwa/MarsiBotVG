@@ -2,6 +2,8 @@ package com.marsi.vg.database;
 
 import com.marsi.commons.database.Row;
 import com.marsi.commons.database.SQLiteDatabase;
+import com.marsi.vg.entities.Lobby;
+import com.marsi.vg.entities.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +45,13 @@ public class VillageGameDatabase extends SQLiteDatabase {
 
                 // Player
                 "CREATE TABLE IF NOT EXISTS player ("
-                        + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        + "id TEXT PRIMARY KEY,"
                         + "discord_id TEXT NOT NULL,"
                         + "role_id INTEGER NULL,"
                         + "house_id TEXT NULL,"
                         + "lobby_id INTEGER NOT NULL,"
+                        + "FOREIGN KEY (role_id) REFERENCES role(id),"
+                        + "FOREIGN KEY (house_id) REFERENCES location(id),"
                         + "FOREIGN KEY (lobby_id) REFERENCES lobby(id));",
 
                 // Role
@@ -262,7 +266,7 @@ public class VillageGameDatabase extends SQLiteDatabase {
         return executor.submit(task);
     }
 
-    public void createLobby(String serverId, int statusId, int maxPlayers) {
+    public void addLobby(String serverId, int statusId, int maxPlayers) {
         Callable<Void> task = () -> {
             try (Connection connection = connect()) {
                 PreparedStatement statement = connection.prepareStatement("INSERT INTO lobby (server_id, status_id, max_players) VALUES (?, ?, ?)");
@@ -278,5 +282,91 @@ public class VillageGameDatabase extends SQLiteDatabase {
             return null;
         };
         executor.submit(task);
+    }
+
+    public void storeLobby(Lobby lobby) {
+        Callable<Void> task = () -> {
+            try (Connection connection = connect()) {
+                PreparedStatement statement = connection.prepareStatement("UPDATE lobby SET status_id = ?, max_players = ? WHERE id = ?");
+                statement.setInt(1, lobby.getStatus().asDatabaseId());
+                statement.setInt(2, lobby.getMaxPlayers());
+                statement.setInt(3, lobby.getId());
+                statement.execute();
+                connection.commit();
+            } catch (Exception e) {
+                logger.error("Error storing lobby", e);
+                throw e;
+            }
+            return null;
+        };
+        executor.submit(task);
+    }
+
+    public void addLocation(String id, String channelId, String name, int lobbyId, int status) {
+        Callable<Void> task = () -> {
+            try (Connection connection = connect()) {
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO location (id, channel_id, name, lobby_id, status_id) VALUES (?, ?, ?, ?, ?)");
+                statement.setString(1, id);
+                statement.setString(2, channelId);
+                statement.setString(3, name);
+                statement.setInt(4, lobbyId);
+                statement.setInt(5, status);
+                statement.execute();
+                connection.commit();
+            } catch (Exception e) {
+                logger.error("Error storing location", e);
+                throw e;
+            }
+            return null;
+        };
+        executor.submit(task);
+    }
+
+    public void addLocation(Location location) {
+        addLocation(location.getId(), String.valueOf(location.getChannelId()), location.getName(), location.getLobbyId(), location.getLocationStatusAsDatabaseId());
+    }
+
+    public void addLocationBulk(List<Location> locations) {
+        Callable<Void> task = () -> {
+            try (Connection connection = connect()) {
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO location (id, channel_id, name, lobby_id, status_id) VALUES (?, ?, ?, ?, ?)");
+                for (Location location : locations) {
+                    statement.setString(1, location.getId());
+                    statement.setString(2, String.valueOf(location.getChannelId()));
+                    statement.setString(3, location.getName());
+                    statement.setInt(4, location.getLobbyId());
+                    statement.setInt(5, location.getLocationStatusAsDatabaseId());
+                    statement.addBatch();
+                }
+                statement.executeBatch();
+                connection.commit();
+            } catch (Exception e) {
+                logger.error("Error storing locations", e);
+                throw e;
+            }
+            return null;
+        };
+        executor.submit(task);
+    }
+
+    public List<Location> getHousesByLobbyId(int lobbyId) {
+        List<Location> result = new ArrayList<>();
+        try (Connection connection = connect();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM location WHERE lobby_id = ? AND id LIKE 'h%'")) {
+            statement.setInt(1, lobbyId);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Location location = new Location(
+                        rs.getString("id"),
+                        rs.getInt("lobby_id"),
+                        rs.getString("name"),
+                        rs.getLong("channel_id")
+                );
+                result.add(location);
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching houses by lobby ID", e);
+        }
+        return result;
     }
 }

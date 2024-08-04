@@ -11,7 +11,7 @@ import java.util.Map;
 public class ServerInfoJsonDatabase {
     private static final Logger logger = LoggerFactory.getLogger("ServerInfoJsonDatabase");
 
-    public static void saveServerInfo(String serverId, Map<String, Long> channelIds, Map<String, Long> rcIds, Map<String, Long> housesIds) {
+    public static void saveServerInfo(String serverId, Map<String, String> channelIds, Map<String, String> rcIds, Map<String, String> housesIds) {
         Gson gson = new Gson();
         String json = "[" + gson.toJson(channelIds) + ",\n" + gson.toJson(rcIds) + ",\n" + gson.toJson(housesIds) + "]";
 

@@ -9,6 +9,7 @@ import java.util.List;
 
 public class Location {
     private String id;
+    private int lobbyId;
     private String name;
     private Long channelId;
     private Channel channel;
@@ -18,8 +19,9 @@ public class Location {
     private boolean isPublic;
     private List<Player> players = new ArrayList<>();
 
-    public Location(String id, String name, Long channelId) {
+    public Location(String id, int lobbyId, String name, Long channelId) {
         this.id = id;
+        this.lobbyId = lobbyId;
         this.name = name;
 
         if (id.startsWith("h")) {
@@ -31,5 +33,33 @@ public class Location {
         this.channelId = channelId;
         this.status = LocationStatus.OPENED;
         this.isPublic = true;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Long getChannelId() {
+        return channelId;
+    }
+
+    public int getLobbyId() {
+        return lobbyId;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public LocationStatus getStatus() {
+        return status;
+    }
+
+    public int getLocationStatusAsDatabaseId() {
+        return status.asDatabaseId();
     }
 }

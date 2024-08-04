@@ -22,8 +22,6 @@ public class ConsoleThread extends Thread {
     public void run() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("> ");
-
             List<String> input = List.of(scanner.nextLine().split(" "));
 
             String command = input.get(0);
