@@ -1,6 +1,7 @@
 package com.marsi.vg.entities;
 
 import com.marsi.commons.database.Row;
+import com.marsi.vg.Launcher;
 import com.marsi.vg.enums.LobbyStatus;
 import org.apache.commons.collections4.set.ListOrderedSet;
 
@@ -58,7 +59,7 @@ public class Lobby {
                 (int) row.get("max_players")
         );
 
-
+        Launcher.getDatabase().getHousesByLobbyId(lobby.getId()).forEach(lobby::addHouse);
 
         return lobby;
     }
