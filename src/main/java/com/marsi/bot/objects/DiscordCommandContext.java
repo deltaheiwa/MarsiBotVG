@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -67,6 +69,14 @@ public class DiscordCommandContext {
             return textEvent.getAuthor();
         } else {
             return slashEvent.getUser();
+        }
+    }
+
+    public TextChannel getChannel() {
+        if (type == DiscordCommandEventType.TEXT) {
+            return textEvent.getChannel().asTextChannel();
+        } else {
+            return slashEvent.getChannel().asTextChannel();
         }
     }
 

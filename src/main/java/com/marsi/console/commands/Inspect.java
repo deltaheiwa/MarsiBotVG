@@ -16,8 +16,7 @@ public class Inspect extends ConsoleCommand {
         String target = args.get(1).toLowerCase();
         switch (target) {
             case "lobbies":
-                for (Iterator<Lobby> it = Launcher.getLobbies(); it.hasNext(); ) {
-                    Lobby lobby = it.next();
+                for (Lobby lobby : Launcher.getLobbyManager().getLobbies()) {
                     System.out.println(lobby);
                 }
                 break;

@@ -1,13 +1,13 @@
 package com.marsi.vg.entities;
 
-import com.marsi.vg.enums.UsagePhase;
+import com.marsi.vg.enums.Phase;
 import com.marsi.vg.enums.VisitType;
 
 public class Visit {
     private final VisitType type;
-    private final UsagePhase phase;
+    private final Phase phase;
 
-    public Visit(VisitType type, UsagePhase phase) {
+    public Visit(VisitType type, Phase phase) {
         this.type = type;
         this.phase = phase;
     }
@@ -16,7 +16,7 @@ public class Visit {
         return type;
     }
 
-    public UsagePhase getPhase() {
+    public Phase getPhase() {
         return phase;
     }
 }

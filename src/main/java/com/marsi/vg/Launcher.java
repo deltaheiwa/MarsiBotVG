@@ -3,6 +3,8 @@ package com.marsi.vg;
 import com.marsi.commons.database.Row;
 import com.marsi.vg.database.VillageGameDatabase;
 import com.marsi.vg.entities.Lobby;
+import com.marsi.vg.events.initializers.PhaseChangeInitializer;
+import com.marsi.vg.managers.LobbyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +20,8 @@ public class Launcher {
     private static VillageGameDatabase database = null;
     private static final ExecutorService executor = Executors.newFixedThreadPool(2);
 
+    private static final LobbyManager lobbyManager = new LobbyManager();
 
-    private static final List<Lobby> lobbies = new CopyOnWriteArrayList<>();
-    private static final CountDownLatch latch = new CountDownLatch(2);
 
     public static void initialize() {
         Callable<Void> databaseTask = () -> {
@@ -51,14 +52,14 @@ public class Launcher {
             List<Row> rows = database.getAllOpenLobbies().get();
             for (Row row : rows) {
                 logger.debug("Loading lobby: {}", row.toString());
-                lobbies.add(Lobby.fromRow(row));
+                lobbyManager.addLobby(Lobby.fromRow(row));
             }
         } catch (Exception e) {
             logger.error("Error loading lobbies", e);
         }
     }
 
-    public static Iterator<Lobby> getLobbies() {
-        return lobbies.iterator();
+    public static LobbyManager getLobbyManager() {
+        return lobbyManager;
     }
 }

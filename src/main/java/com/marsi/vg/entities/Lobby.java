@@ -3,11 +3,14 @@ package com.marsi.vg.entities;
 import com.marsi.commons.database.Row;
 import com.marsi.vg.Launcher;
 import com.marsi.vg.enums.LobbyStatus;
+import com.marsi.vg.managers.GameManager;
 import org.apache.commons.collections4.set.ListOrderedSet;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,9 +19,9 @@ public class Lobby {
     private final String serverId;
     private LobbyStatus status;
     private int maxPlayers;
-    private ListOrderedSet<Role> role_list;
+    private final GameManager gameManager;
 
-    private List<Player> players;
+    private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
     private Map<String, String> channelMap;
     private List<Location> houses;
 
@@ -29,8 +32,7 @@ public class Lobby {
         this.status = status;
         this.maxPlayers = maxPlayers;
 
-        this.role_list = new ListOrderedSet<>();
-        this.players = new ArrayList<>();
+        this.gameManager = new GameManager(this);
         this.channelMap = Stream.of(new String[][] {
                 { "rules", "" },
                 { "mechanics", "" },
@@ -97,6 +99,10 @@ public class Lobby {
 
     public List<Location> getHouses() {
         return houses;
+    }
+
+    public void registerPlayer(Player player) {
+        players.put(player.getUserId(), player);
     }
 
     @Override

@@ -7,9 +7,9 @@ package com.marsi.vg.enums;
 public enum AbilityCategory {
     LETHAL,
     CURING,
-    PROTECTION,
     INFORMATION,
     COMMUNICATION,
+    TRANSPORTATION,
     MANIPULATION,
     BLOCKING,
     OTHER

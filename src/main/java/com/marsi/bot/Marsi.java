@@ -78,6 +78,7 @@ public class Marsi {
 
         commands.add(new AutoMap());
         commands.add(new MapChannel());
+        commands.add(new Test());
     }
 
     public PrefixDatabase getPrefixDatabase() {
