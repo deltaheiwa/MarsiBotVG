@@ -6,14 +6,15 @@ import com.marsi.vg.events.listeners.PhaseChangeListener;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
+import java.util.List;
+
 public class Player implements PhaseChangeListener {
     private Member discordMember;
     private TextChannel roleChannel;
 
     private Role role;
     private boolean isAlive;
-    private int availableDayVisits;
-    private int availableNightVisits;
+    private List<Visit> availableVisits;
 
     public Player(Member discordMember, TextChannel roleChannel) {
         this.discordMember = discordMember;
@@ -21,8 +22,7 @@ public class Player implements PhaseChangeListener {
 
         this.role = null;
         this.isAlive = true;
-        this.availableDayVisits = 0;
-        this.availableNightVisits = 0;
+        this.availableVisits = null;
 
         PhaseChangeInitializer.addListener(this);
     }

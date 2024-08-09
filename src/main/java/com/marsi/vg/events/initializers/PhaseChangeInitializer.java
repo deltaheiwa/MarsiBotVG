@@ -1,5 +1,7 @@
 package com.marsi.vg.events.initializers;
 
+import com.marsi.vg.entities.Phase;
+import com.marsi.vg.enums.PhaseType;
 import com.marsi.vg.events.PhaseChangeEvent;
 import com.marsi.vg.events.listeners.PhaseChangeListener;
 
@@ -13,8 +15,8 @@ public class PhaseChangeInitializer {
         listeners.add(listener);
     }
 
-    public static void changePhase(Object source) {
-        PhaseChangeEvent event = new PhaseChangeEvent(source);
+    public static void changePhase(Object source, Phase phase) {
+        PhaseChangeEvent event = new PhaseChangeEvent(source, phase);
         listeners.forEach(listener -> {
             listener.onPhaseChange(event);
         });

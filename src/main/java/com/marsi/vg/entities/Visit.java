@@ -1,22 +1,22 @@
 package com.marsi.vg.entities;
 
-import com.marsi.vg.enums.Phase;
+import com.marsi.vg.enums.PhaseType;
 import com.marsi.vg.enums.VisitType;
 
 public class Visit {
     private final VisitType type;
-    private final Phase phase;
+    private final PhaseType phaseType;
 
-    public Visit(VisitType type, Phase phase) {
+    public Visit(VisitType type, PhaseType phaseType) {
         this.type = type;
-        this.phase = phase;
+        this.phaseType = phaseType;
     }
 
     public VisitType getType() {
         return type;
     }
 
-    public Phase getPhase() {
-        return phase;
+    public PhaseType getPhase() {
+        return phaseType;
     }
 }

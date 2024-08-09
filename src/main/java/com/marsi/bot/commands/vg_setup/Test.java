@@ -28,6 +28,6 @@ public class Test extends DiscordCommand {
     public void execute(DiscordCommandContext context) {
         Launcher.getLobbyManager().getLobbyByServerId(context.getGuild().getId()).registerPlayer(new Player(context.getAuthorMember(), context.getChannel()));
 
-        PhaseChangeInitializer.changePhase(this);
+        PhaseChangeInitializer.changePhase(this, null);
     }
 }

@@ -1,8 +1,8 @@
 package com.marsi.vg.entities;
 
-import com.marsi.vg.enums.Phase;
+import com.marsi.vg.enums.PhaseType;
 
 public abstract class ActiveAbility extends Ability {
-    private Phase usagePhase;
+    private PhaseType usagePhaseType;
     private int usesPerGame;  // -1 for unlimited
 }

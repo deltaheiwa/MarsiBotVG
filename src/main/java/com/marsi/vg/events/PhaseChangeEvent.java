@@ -1,15 +1,14 @@
 package com.marsi.vg.events;
 
+import com.marsi.vg.entities.Phase;
+import com.marsi.vg.enums.PhaseType;
+
 import java.util.EventObject;
 
 public class PhaseChangeEvent extends EventObject {
-    /**
-     * Constructs a prototypical Event.
-     *
-     * @param source the object on which the Event initially occurred
-     * @throws IllegalArgumentException if source is null
-     */
-    public PhaseChangeEvent(Object source) {
+    private Phase phase;
+    public PhaseChangeEvent(Object source, Phase phase) {
         super(source);
+        this.phase = phase;
     }
 }
